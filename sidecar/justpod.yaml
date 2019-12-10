@@ -63,7 +63,7 @@ spec:
           path: /var/cache/pmu
           type: DirectoryOrCreate
       - name: config
-          configMap:
+        configMap:
           name: collectd-config
           items:
           - key:  node-sidecar-collectd.conf
