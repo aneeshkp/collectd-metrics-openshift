@@ -8,12 +8,7 @@ spec:
   volumes:
   - name: shared-logs
     emptyDir: {}
-
-  # In the sidecar pattern, there is a main application
-  # container and a sidecar container.
   containers:
-
-  # Main application container
   - name: nginx
     image: nginx:1.7.9 
     command: ["/bin/sh"]
@@ -21,9 +16,7 @@ spec:
       - containerPort: 8081
     volumeMounts:
     - name: shared-logs
-      mountPath: /usr/share/nginx/html
-  
-
+      mountPath: /usr/share/nginx/html 
   # Sidecar container
   - name: sidecar-collectd-container
     # Simple sidecar: display log files using nginx.
@@ -33,8 +26,8 @@ spec:
     securityContext:
       privileged: true
     volumeMounts:
-        - name: shared-logs
-          mountPath: /var/lib/collectd/csv
+        - mountPath: /var/lib/collectd/csv
+          name: shared-logs
         - mountPath: /var/cache/pmu
           name: pmu
           readOnly: false
