@@ -3,7 +3,6 @@ apiVersion: v1
 metadata:
   name: collectd-sidecar-config
 data:
-
   node-sidecar-collectd.conf: |-
     #Hostname "<hostname_goes_here>"
     #Sets the hostname that identifies a host. If you omit this setting, 
@@ -25,7 +24,6 @@ data:
     #</Plugin>
     #Last line (collectd requires ‘\n’ at the last line)
 ---    
-
 apiVersion: v1
 kind: Pod
 metadata:
@@ -114,16 +112,3 @@ spec:
 
       terminationGracePeriodSeconds: 10
       restartPolicy: Always    
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: collectd-sidecar-pod-service
-  labels:
-    app: collectd-sidecar-pod-service
-spec:
-  ports:
-  - port: 8081
-    targetPort: 8081
-  selector:
-    app: collectd-sidecar-pod-service
