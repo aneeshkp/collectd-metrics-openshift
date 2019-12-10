@@ -45,6 +45,8 @@ spec:
   - name: nginx
     image: nginx:1.7.9 
     command: ["/bin/sh"]
+    ports:
+      - containerPort: 8081
     volumeMounts:
     - name: shared-logs
       mountPath: /usr/share/nginx/html
@@ -58,9 +60,6 @@ spec:
     image: docker.io/opnfv/barometer-collectd
     securityContext:
       privileged: true
-    ports:
-      - containerPort: 8081
-
     volumeMounts:
         - name: shared-logs
           mountPath: /var/lib/collectd/csv
