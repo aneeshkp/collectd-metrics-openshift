@@ -8,15 +8,22 @@ spec:
   volumes:
   - name: shared-logs
     emptyDir: {}
+
+  # In the sidecar pattern, there is a main application
+  # container and a sidecar container.
   containers:
+
+  # Main application container
   - name: nginx
     image: nginx:1.7.9 
     command: ["/bin/sh"]
     ports:
-      - containerPort: 8081
+      - containerPort: 80
     volumeMounts:
     - name: shared-logs
-      mountPath: /usr/share/nginx/html 
+      mountPath: /usr/share/nginx/html
+  
+
   # Sidecar container
   - name: sidecar-collectd-container
     # Simple sidecar: display log files using nginx.
@@ -26,8 +33,8 @@ spec:
     securityContext:
       privileged: true
     volumeMounts:
-        - mountPath: /var/lib/collectd/csv
-          name: shared-logs
+        - name: shared-logs
+          mountPath: /var/lib/collectd/csv
         - mountPath: /var/cache/pmu
           name: pmu
           readOnly: false
@@ -50,32 +57,30 @@ spec:
 #        - mountPath: /proc
 #          name: proc
 #          readOnly: true
-      volumes:
-        - name: pmu
-          hostPath:
-            path: /var/cache/pmu
-            type: DirectoryOrCreate
-        - name: config
+    volumes:
+      - name: pmu
+        hostPath:
+          path: /var/cache/pmu
+          type: DirectoryOrCreate
+      - name: config
           configMap:
-            name: collectd-config
-            items:
-            - key:  node-sidecar-collectd.conf
-              path: collectd.conf
-        - name: host-var-run
-          hostPath:
-            path: /var/run
-        - name: host-tmp
-          hostPath:
-            path: /tmp
-        - name: host-var-lib-collectd
-          hostPath:
-            path: /var/lib/collectd
-        - name: host-slash
-          hostPath:
-            path: /
-#        - name: proc
-#          hostPath:
-#            path: /proc
-
-      terminationGracePeriodSeconds: 10
-      restartPolicy: Always
+          name: collectd-config
+          items:
+          - key:  node-sidecar-collectd.conf
+            path: collectd.conf
+      - name: host-var-run
+        hostPath:
+          path: /var/run
+      - name: host-tmp
+        hostPath:
+          path: /tmp
+      - name: host-var-lib-collectd
+        hostPath:
+          path: /var/lib/collectd
+      - name: host-slash
+        hostPath:
+          path: /
+#      - name: proc
+#        hostPath:
+#          path: /proc
+  
