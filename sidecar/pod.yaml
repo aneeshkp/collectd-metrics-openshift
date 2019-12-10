@@ -109,8 +109,7 @@ spec:
 #      - name: proc
 #        hostPath:
 #          path: /proc
-     terminationGracePeriodSeconds: 10
-    restartPolicy: Always
+ 
 ---
 apiVersion: v1
 kind: Service
