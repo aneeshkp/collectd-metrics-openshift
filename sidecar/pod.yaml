@@ -1,35 +1,40 @@
-# Example YAML configuration for the sidecar pattern.
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: collectd-sidecar-config
+data:
 
-# It defines a main application container which writes
-# the current date to a log file every five seconds.
+  node-sidecar-collectd.conf: |-
+    #Hostname "<hostname_goes_here>"
+    #Sets the hostname that identifies a host. If you omit this setting, 
+    #the hostname will be determined using the gethostname(2) system call.
+    #
+    Interval "10"
+    LoadPlugin network
+   <Plugin interface>
+    Interface "lo"
+    IgnoreSelected true
+  </Plugin>
 
-# The sidecar container is nginx serving that log file.
-# (In practice, your sidecar is likely to be a log collection
-# container that uploads to external storage.)
-
-# To run:
-#   kubectl apply -f pod.yaml
-
-# Once the pod is running:
-#   
-#   (Connect to the sidecar pod)
-#   kubectl exec pod-with-sidecar -c sidecar-container -it bash
-#   
-#   (Install curl on the sidecar)
-#   apt-get update && apt-get install curl
-#   
-#   (Access the log file via the sidecar)
-#   curl 'http://localhost:80/app.txt'
+    LoadPlugin network
+    <Plugin network>
+        Server "<destination_host_goes_here>" "25826" 
+    </Plugin>
+    #<Plugin "write_prometheus">
+    #  Port "9103"
+    #</Plugin>
+    #Last line (collectd requires ‘\n’ at the last line)
+---    
 
 apiVersion: v1
 kind: Pod
 metadata:
   name: pod-with-sidecar
+  labels:
+    app: collectd-sidecar-pod-service
 spec:
-  # Create a volume called 'shared-logs' that the
-  # app and sidecar share.
   volumes:
-  - name: shared-logs 
+  - name: shared-logs
     emptyDir: {}
 
   # In the sidecar pattern, there is a main application
@@ -37,18 +42,13 @@ spec:
   containers:
 
   # Main application container
-  - name: app-container
-    # Simple application: write the current date
-    # to the log file every five seconds
-    image: alpine # alpine is a simple Linux OS image
+  - name: nginx
+    image: nginx:1.7.9 
     command: ["/bin/sh"]
-    args: ["-c", "while true; do date >> /var/log/app.txt; sleep 5;done"]
-
-    # Mount the pod's shared log file into the app 
-    # container. The app writes logs here.
     volumeMounts:
     - name: shared-logs
-      mountPath: /var/log
+      mountPath: /usr/share/nginx/html
+  
 
   # Sidecar container
   - name: sidecar-collectd-container
@@ -56,10 +56,14 @@ spec:
     # In reality, this sidecar would be a custom image
     # that uploads logs to a third-party or storage service.
     image: docker.io/opnfv/barometer-collectd
+    securityContext:
+      privileged: true
     ports:
-      - containerPort: 80
+      - containerPort: 8081
 
     volumeMounts:
+        - name: shared-logs
+          mountPath: /var/lib/collectd/csv
         - mountPath: /var/cache/pmu
           name: pmu
           readOnly: false
@@ -91,7 +95,7 @@ spec:
           configMap:
             name: collectd-config
             items:
-            - key: node-collectd.conf
+            - key:  node-sidecar-collectd.conf
               path: collectd.conf
         - name: host-var-run
           hostPath:
@@ -112,3 +116,16 @@ spec:
       terminationGracePeriodSeconds: 10
 
       restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: collectd-sidecar-pod-service
+  labels:
+    app: collectd-sidecar-pod-service
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8081
+  selector:
+    app: collectd-sidecar-pod-service
