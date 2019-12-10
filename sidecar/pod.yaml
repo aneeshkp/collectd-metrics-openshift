@@ -3,17 +3,18 @@ apiVersion: v1
 metadata:
   name: collectd-sidecar-config
 data:
+
   node-sidecar-collectd.conf: |-
     #Hostname "<hostname_goes_here>"
     #Sets the hostname that identifies a host. If you omit this setting, 
     #the hostname will be determined using the gethostname(2) system call.
     #
     Interval "10"
-    LoadPlugin network
-   <Plugin interface>
-    Interface "lo"
-    IgnoreSelected true
-  </Plugin>
+    LoadPlugin interface
+    <Plugin interface>
+     Interface "lo"
+     IgnoreSelected true
+    </Plugin>
 
     LoadPlugin network
     <Plugin network>
@@ -31,14 +32,9 @@ metadata:
   labels:
     app: collectd-sidecar-pod-service
 spec:
-  volumes:
-  - name: shared-logs
-    emptyDir: {}
-
   # In the sidecar pattern, there is a main application
   # container and a sidecar container.
   containers:
-
   # Main application container
   - name: nginx
     image: nginx:1.7.9 
@@ -48,68 +44,60 @@ spec:
     volumeMounts:
     - name: shared-logs
       mountPath: /usr/share/nginx/html
-  
-
   # Sidecar container
   - name: sidecar-collectd-container
-    # Simple sidecar: display log files using nginx.
-    # In reality, this sidecar would be a custom image
-    # that uploads logs to a third-party or storage service.
     image: docker.io/opnfv/barometer-collectd
-    securityContext:
-      privileged: true
+
     volumeMounts:
-        - name: shared-logs
-          mountPath: /var/lib/collectd/csv
-        - mountPath: /var/cache/pmu
-          name: pmu
-          readOnly: false
-        - mountPath: /opt/collectd/etc/
-          name: config
-          readOnly: true
-        - mountPath: /var/run
-          name: host-var-run
-          readOnly: false
-        - mountPath: /tmp
-          name: host-tmp
-          readOnly: false
-        - mountPath: /var/lib/collectd
-          name: host-var-lib-collectd
-          readOnly: true
-          # to run commands chroot in to the host
-        - mountPath: /host
-          name: host-slash
-          readOnly: true
-#        - mountPath: /proc
-#          name: proc
-#          readOnly: true
-    volumes:
-      - name: pmu
-        hostPath:
-          path: /var/cache/pmu
-          type: DirectoryOrCreate
-      - name: config
-        configMap:
-          name: collectd-config
-          items:
-          - key:  node-sidecar-collectd.conf
-            path: collectd.conf
-      - name: host-var-run
-        hostPath:
-          path: /var/run
-      - name: host-tmp
-        hostPath:
-          path: /tmp
-      - name: host-var-lib-collectd
-        hostPath:
-          path: /var/lib/collectd
-      - name: host-slash
-        hostPath:
-          path: /
-#      - name: proc
-#        hostPath:
-#          path: /proc
- 
+    - mountPath: /var/lib/collectd/csv
+      name: shared-logs
+    - mountPath: /var/cache/pmu
+      name: pmu
+      readOnly: false
+    - mountPath: /opt/collectd/etc/
+      name: config
+      readOnly: true
+    - mountPath: /var/run
+      name: host-var-run
+      readOnly: false
+    - mountPath: /tmp
+      name: host-tmp
+      readOnly: false
+    - mountPath: /var/lib/collectd
+      name: host-var-lib-collectd
+      readOnly: true
+      # to run commands chroot in to the host
+    - mountPath: /host
+      name: host-slash
+      readOnly: true
+  volumes:
+    - name: shared-logs
+      emptyDir: {}
+    - name: pmu
+      hostPath:
+        path: /var/cache/pmu
+        type: DirectoryOrCreate
+    - name: config
+      configMap:
+        name: collectd-config
+        items:
+        - key:  node-sidecar-collectd.conf
+          path: collectd.conf
+    - name: host-var-run
+      hostPath:
+        path: /var/run
+    - name: host-tmp
+      hostPath:
+        path: /tmp
+    - name: host-var-lib-collectd
+      hostPath:
+        path: /var/lib/collectd
+    - name: host-slash
+      hostPath:
+        path: /
+#    - name: proc
+#      hostPath:
+#        path: /proc 
 ---
 apiVersion: v1
 kind: Service
