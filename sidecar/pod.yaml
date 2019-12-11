@@ -48,8 +48,8 @@ spec:
   - name: sidecar-collectd-container
     image: docker.io/opnfv/barometer-collectd
     securityContext:
-          privileged: true
-        resources: {}
+      privileged: true
+    resources: {}
 
     volumeMounts:
     - mountPath: /var/lib/collectd/csv
