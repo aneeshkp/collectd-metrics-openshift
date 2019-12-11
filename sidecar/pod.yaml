@@ -79,9 +79,9 @@ spec:
         type: DirectoryOrCreate
     - name: config
       configMap:
-        name: collectd-config
+        name: collectd-sidecar-config
         items:
-        - key:  node-sidecar-collectd.conf
+        - key: node-sidecar-collectd.conf
           path: collectd.conf
     - name: host-var-run
       hostPath:
