@@ -17,7 +17,7 @@ data:
     </Plugin>
     LoadPlugin csv
     <Plugin csv>
-      DataDir "/var/lib/collectd/csv"
+      DataDir "/tmp/collectd/csv"
       StoreRates true
     </Plugin>
 
@@ -57,7 +57,7 @@ spec:
     resources: {}
 
     volumeMounts:
-    - mountPath: /var/lib/collectd/csv
+    - mountPath: /tmp/collectd/csv
       name: shared-logs
     - mountPath: /var/cache/pmu
       name: pmu
