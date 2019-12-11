@@ -19,7 +19,7 @@ data:
     <Plugin csv>
       DataDir "/var/lib/collectd/csv"
       StoreRates true
-  </Plugin>
+    </Plugin>
 
     LoadPlugin network
     <Plugin network>
