@@ -42,8 +42,7 @@ spec:
   containers:
   # Main application container
   - name: nginx
-    image: nginx:1.7.9 
-    command: ["/bin/sh"]
+    image: nginx 
     ports:
       - containerPort: 80
     volumeMounts:
@@ -116,6 +115,7 @@ metadata:
 spec:
   ports:
   - port: 8081
+    nodePort: 31704
     targetPort: 80
   selector:
     app: collectd-sidecar-pod-service
