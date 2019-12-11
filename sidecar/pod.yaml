@@ -18,7 +18,7 @@ data:
 
     LoadPlugin network
     <Plugin network>
-        Server "<destination_host_goes_here>" "25826" 
+        Server "localhost" "30301" 
     </Plugin>
     #<Plugin "write_prometheus">
     #  Port "9103"
