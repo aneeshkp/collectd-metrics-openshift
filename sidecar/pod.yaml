@@ -113,6 +113,7 @@ metadata:
   labels:
     app: collectd-sidecar-pod-service
 spec:
+  type: NodePort
   ports:
   - port: 8081
     nodePort: 31704
