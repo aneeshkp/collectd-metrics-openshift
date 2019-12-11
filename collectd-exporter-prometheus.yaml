@@ -425,34 +425,9 @@ data:
       - names: ['node-exporter']
         type: A
         port: 9100
-    - job_name: 'ceph'
-      honor_labels: true
-      file_sd_configs:
-        - files:
-          - ceph_targets.json
     - job_name: 'collectd'
       static_configs:
         - targets: ['localhost:9103']
-      #- job_name: 'etcd'
-      #static_configs:
-      #- targets: ['mgmt01:2379', 'mgmt02:2379', 'mgmt03:2379']
-    - job_name: 'slurm'
-      static_configs:
-        - targets: ['login01:8080']
-    - job_name: 'ipmi'
-      scrape_interval:     60s      ## updated 4/13/18: set 60s from global 15s, high kernel ipmi module activity on nodes
-      static_configs:
-          - targets: ['dgx01:9289','dgx02:9289','dgx03:9289','dgx04:9289','dgx05:9289','dgx06:9289','dgx07:9289','dgx08:9289','dgx09:9289','dgx10:9289','dgx11:9289','dgx12:9289','dgx13:9289','dgx14:9289','dgx15:9289','dgx16:9289','dgx17:9289','dgx18:9289','dgx19:9289','dgx20:9289','dgx21:9289','dgx22:9289','dgx23:9289','dgx24:9289','dgx25:9289','dgx26:9289','dgx27:9289','dgx28:9289','dgx29:9289','dgx30:9289','dgx31:9289','dgx32:9289','dgx33:9289','dgx34:9289','dgx35:9289','dgx36:9289']
-
-  ceph_targets.json: |
-    [
-        {
-            "targets": [ "rook-ceph-mgr.rook-ceph.svc:9283" ],
-            "labels": {
-                "instance": "ceph_cluster"
-            }
-        }
-    ]
   alert_rules.yml: |
     groups:
     - name: default
@@ -574,20 +549,4 @@ spec:
     nodePort: 30301
     protocol: TCP
   type: NodePort
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: prometheus-volume
-  namespace: default
-  labels:
-    app: prometheus
-  annotations:
-    volume.alpha.kubernetes.io/storage-class: default
-spec:
-  storageClassName: rook-ceph-block
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
+
