@@ -109,8 +109,7 @@ spec:
           protocol: UDP
       volumes:
       - name: data
-        persistentVolumeClaim:
-          claimName: prometheus-volume
+        emptyDir: {}
       - name: config-volume-prometheus
         configMap:
           name: prometheus-config
