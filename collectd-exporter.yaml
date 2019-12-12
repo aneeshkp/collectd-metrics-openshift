@@ -1,0 +1,48 @@
+# test alert: curl -H "Content-Type: application/json" -d '[{"labels":{"alertname":"TestAlert1", "severity":"critical"}}]' localhost:9093/api/v1/alerts
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: collectd-exporter
+  name: collectd-exporter
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: collectd-exporter
+    spec:
+      containers:
+      - image: prom/collectd-exporter 
+        name: collectd-exporter
+        args:
+          - "--collectd.listen-address=:25826"
+        ports:
+        - name: http
+          containerPort: 9103
+          protocol: TCP
+        - name: network
+          containerPort: 25826
+          protocol: UDP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: collectd-exporter
+  namespace: default
+spec:
+  selector:
+    app: collectd-exporter
+  ports:
+  - name: network
+    port: 25826
+    targetPort: 25826
+    nodePort: 30300
+    protocol: UDP
+  - name: http
+    port: 9103
+    targetPort: 9103
+    nodePort: 30301
+    protocol: TCP
