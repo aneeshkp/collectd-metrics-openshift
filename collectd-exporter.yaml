@@ -39,10 +39,8 @@ spec:
   - name: network
     port: 25826
     targetPort: 25826
-    nodePort: 30300
     protocol: UDP
   - name: http
     port: 9103
     targetPort: 9103
-    nodePort: 30301
     protocol: TCP
