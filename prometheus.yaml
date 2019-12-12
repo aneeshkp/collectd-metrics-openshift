@@ -85,6 +85,12 @@ spec:
           limits:
             cpu: 1000m
             memory: 2400Mi
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config-volume-prometheus
+        configMap:
+          name: prometheus-config
 ---
 apiVersion: v1
 kind: ConfigMap
