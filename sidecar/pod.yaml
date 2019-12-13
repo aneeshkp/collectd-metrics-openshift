@@ -23,7 +23,7 @@ data:
 
     LoadPlugin network
     <Plugin network>
-        Server "collectd-exporter-default.apps.test1.sriov.testing" "25826" 
+        Server "NODE-ID" "NODE-PORT" 
     </Plugin>
     #<Plugin "write_prometheus">
     #  Port "9103"
