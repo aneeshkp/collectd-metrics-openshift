@@ -64,7 +64,7 @@ spec:
     securityContext:
       privileged: true
     resources: {}  
-        volumeMounts:
+    volumeMounts:
     - name: shared-logs
       mountPath: /usr/share/nginx/html
   # Sidecar container
