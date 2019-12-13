@@ -23,7 +23,7 @@ data:
 
     LoadPlugin network
     <Plugin network>
-        Server "NODE-ID" "NODE-PORT" 
+        Server "NODE-ID" "30300" 
     </Plugin>
     #<Plugin "write_prometheus">
     #  Port "9103"
