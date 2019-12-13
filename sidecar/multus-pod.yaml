@@ -58,15 +58,6 @@ spec:
     command:
     - /sbin/init
   # Sidecar container
-  - name: sidecar-multus-collectd-container
-    image: docker.io/opnfv/barometer-collectd
-    securityContext:
-      privileged: true
-    resources: {}
-        volumeMounts:
-    - name: shared-logs
-      mountPath: /usr/share/nginx/html
-  # Sidecar container
   - name: sidecar-collectd-container
     image: docker.io/opnfv/barometer-collectd
     securityContext:
