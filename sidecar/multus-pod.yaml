@@ -99,7 +99,7 @@ spec:
         type: DirectoryOrCreate
     - name: config
       configMap:
-        name: collectd-sidecar-config
+        name: collectd-multus-sidecar-config
         items:
         - key: node-sidecar-collectd.conf
           path: collectd.conf
