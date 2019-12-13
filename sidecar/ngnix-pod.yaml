@@ -1,0 +1,90 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: collectd-sidecar-config
+data:
+
+  node-sidecar-collectd.conf: |-
+    #Hostname "<hostname_goes_here>"
+    #Sets the hostname that identifies a host. If you omit this setting, 
+    #the hostname will be determined using the gethostname(2) system call.
+    #
+    Interval 10
+    LoadPlugin "logfile"
+    <Plugin "logfile">
+      LogLevel "info"
+      File "/var/log/collectd.log"
+      Timestamp true
+    </Plugin>
+    LoadPlugin interface
+    <Plugin interface>
+     Interface "lo"
+     IgnoreSelected true
+    </Plugin>
+    #LoadPlugin csv
+    #<Plugin csv>
+    #  DataDir "/tmp/collectd/csv"
+    #  StoreRates true
+    #</Plugin>
+    LoadPlugin memory
+    <Plugin memory>
+      ValuesAbsolute true
+      ValuesPercentage true
+    </Plugin>
+    LoadPlugin network
+    <Plugin network>
+      Server "192.168.111.15" "30300"
+    </Plugin>
+    #<Plugin "write_prometheus">
+    #  Port "9103"
+    #</Plugin>
+    #Last line (collectd requires ‘\n’ at the last line)
+---    
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-sidecar
+  labels:
+    app: collectd-sidecar-pod-service
+spec:
+  # In the sidecar pattern, there is a main application
+  # container and a sidecar container.
+  containers:
+  # Main application container
+  - name: nginx
+    image: nginx 
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: shared-logs
+      mountPath: /usr/share/nginx/html
+  # Sidecar container
+  - name: sidecar-collectd-container
+    image: docker.io/opnfv/barometer-collectd
+    securityContext:
+      privileged: true
+    resources: {}  
+  volumes:
+    - name: shared-logs
+      emptyDir: {}
+    - name: config
+      configMap:
+        name: collectd-sidecar-config
+        items:
+        - key: node-sidecar-collectd.conf
+          path: collectd.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: collectd-sidecar-pod-service
+  labels:
+    app: collectd-sidecar-pod-service
+spec:
+  type: NodePort
+  ports:
+  - port: 8081
+    nodePort: 31704
+    targetPort: 80
+  selector:
+    app: collectd-sidecar-pod-service
