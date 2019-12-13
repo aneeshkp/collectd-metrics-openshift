@@ -64,15 +64,66 @@ spec:
     securityContext:
       privileged: true
     resources: {}  
+        volumeMounts:
+    - name: shared-logs
+      mountPath: /usr/share/nginx/html
+  # Sidecar container
+  - name: sidecar-collectd-container
+    image: docker.io/opnfv/barometer-collectd
+    securityContext:
+      privileged: true
+    resources: {}
+
+    volumeMounts:
+    - mountPath: /tmp/collectd/csv
+      name: shared-logs
+    - mountPath: /var/cache/pmu
+      name: pmu
+      readOnly: false
+    - mountPath: /opt/collectd/etc/
+      name: config
+      readOnly: true
+    - mountPath: /var/run
+      name: host-var-run
+      readOnly: false
+    - mountPath: /tmp
+      name: host-tmp
+      readOnly: false
+    - mountPath: /var/lib/collectd
+      name: host-var-lib-collectd
+      readOnly: true
+      # to run commands chroot in to the host
+    - mountPath: /host
+      name: host-slash
+      readOnly: true
   volumes:
     - name: shared-logs
       emptyDir: {}
+    - name: pmu
+      hostPath:
+        path: /var/cache/pmu
+        type: DirectoryOrCreate
     - name: config
       configMap:
         name: collectd-sidecar-config
         items:
         - key: node-sidecar-collectd.conf
           path: collectd.conf
+    - name: host-var-run
+      hostPath:
+        path: /var/run
+    - name: host-tmp
+      hostPath:
+        path: /tmp
+    - name: host-var-lib-collectd
+      hostPath:
+        path: /var/lib/collectd
+    - name: host-slash
+      hostPath:
+        path: /
+#    - name: proc
+#      hostPath:
+#        path: /proc 
 ---
 apiVersion: v1
 kind: Service
