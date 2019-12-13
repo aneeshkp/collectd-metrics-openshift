@@ -73,7 +73,6 @@ spec:
     securityContext:
       privileged: true
     resources: {}
-
     volumeMounts:
     - mountPath: /tmp/collectd/csv
       name: shared-logs
