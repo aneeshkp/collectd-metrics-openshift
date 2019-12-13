@@ -9,21 +9,31 @@ data:
     #Sets the hostname that identifies a host. If you omit this setting, 
     #the hostname will be determined using the gethostname(2) system call.
     #
-    Interval "10"
+    Interval 10
+    LoadPlugin "logfile"
+    <Plugin "logfile">
+      LogLevel "info"
+      File "/var/log/collectd.log"
+      Timestamp true
+    </Plugin>
     LoadPlugin interface
     <Plugin interface>
      Interface "lo"
      IgnoreSelected true
     </Plugin>
-    LoadPlugin csv
-    <Plugin csv>
-      DataDir "/tmp/collectd/csv"
-      StoreRates true
+    #LoadPlugin csv
+    #<Plugin csv>
+    #  DataDir "/tmp/collectd/csv"
+    #  StoreRates true
+    #</Plugin>
+    LoadPlugin memory
+    <Plugin memory>
+      ValuesAbsolute true
+      ValuesPercentage true
     </Plugin>
-
     LoadPlugin network
     <Plugin network>
-        Server "NODE-ID" "30300" 
+      Server "192.168.111.15" "30300"
     </Plugin>
     #<Plugin "write_prometheus">
     #  Port "9103"
